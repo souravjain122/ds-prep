@@ -6,7 +6,7 @@ from scipy import stats
 
 def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
     """
-    Computes z-statistic, p_value and confidence intervals.
+    Computes two sided z-statistic, p_value and confidence intervals.
     
     Parameters
     ----------
@@ -71,7 +71,7 @@ def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
 
 def welch_ttest(a, b, alpha=0.05):
     """
-    Computes t-statistic, degree of freedom, p_value and confidence intervals.
+    Computes two sided t-statistic, degree of freedom, p_value and confidence intervals.
     
     Parameters
     ----------
@@ -137,7 +137,7 @@ def welch_ttest(a, b, alpha=0.05):
 
 def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
     """
-    Computes confidence intervals by forming new samples using given samples only 
+    Computes two sided confidence intervals by forming new samples using given samples only 
     
     Parameters
     ----------

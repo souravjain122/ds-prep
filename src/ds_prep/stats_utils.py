@@ -23,7 +23,7 @@ def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
 
     Returns
     -------
-    diff : int
+    diff : float
         Change in success rate in treatment group as to the control group
     z : float
         z-statistic
@@ -75,9 +75,9 @@ def welch_ttest(a, b, alpha=0.05):
     
     Parameters
     ----------
-    a : list
+    a : array-like
         Values in treatment group
-    b : list
+    b : array-like
         Values in control group
     alpha : float
         Significance level, with Confidence Interval covering 1 - alpha
@@ -117,7 +117,7 @@ def welch_ttest(a, b, alpha=0.05):
     # Step 5: Degree of freedom
     df = ((var_a_mean + var_b_mean)**2)/((var_a_mean**2)/(n_a - 1) + (var_b_mean**2)/(n_b - 1))
     # Step 6: p-value
-    p_value = (1 - stats.t.cdf(t_obs, df)) * 2
+    p_value = stats.t.sf(abs(t_obs), df) * 2
     # Step 7: t-critical as per significance level and degree of freedom
     t_critical = stats.t.ppf(1 - alpha/2, df)
     # Step 8: Confidence intervals
@@ -141,9 +141,9 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
     
     Parameters
     ----------
-    a : list
+    a : array-like
         Values in treatment group
-    b : list
+    b : array-like
         Values in control group
     stat : numpy function
         Statistic to use to get confidence interval
@@ -180,7 +180,7 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
     stat_new_b = stat(new_b, axis = 1)
     # Step 4: Confidence Intervals
     diff_stats = stat_new_a - stat_new_b
-    ci = np.quantile(diff_stats, [alpha, 1-alpha])
+    ci = np.quantile(diff_stats, [alpha/2, 1-alpha/2])
     ci_low = ci[0]
     ci_high = ci[1]
     # Step 5: Final dictionary to return
@@ -190,12 +190,3 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
         "ci_high": ci_high
     }
     return final_dict
-
-# if __name__ == "__main__":
-#     # Reorder-button example from the Day 3 page: treatment first, control second
-#     # print(two_prop_ztest(2120, 20000, 2000, 20000))
-#     # print(two_prop_ztest(3816, 36000, 400, 4000))
-#     # print(two_prop_ztest(424, 4000, 3600, 36000))
-#     # print(two_prop_ztest(300, 1000, 10, 100))
-#     # print(welch_ttest([16.2, 14.8, 17.5, 15.9, 16.8, 15.1, 17.2, 16.4], [15.0, 14.1, 15.8, 14.6, 16.2, 13.9]))
-#     print(bootstrap_ci([16.2, 14.8, 17.5, 15.9, 16.8, 15.1, 17.2, 16.4], [15.0, 14.1, 15.8, 14.6, 16.2, 13.9]))

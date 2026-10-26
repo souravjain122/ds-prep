@@ -101,7 +101,7 @@ def mde_prop(p1, n_per_arm, alpha=0.05, power=0.8):
     -----
     ratio is assumed to be one for this function meaning sample size of control group is equal to sample size of treatment group.
     mde is considered small so p2(1-p2) is approximately equal to p1(1-p1)
-    Assuming same pooled SE for both H0 and H1
+    assuming approximates p₂(1−p₂) ≈ p₁(1−p₁), one SE for both H₀ and H₁
     """
     # Step 1: z-statistics
     z_a = NormalDist().inv_cdf(1 - alpha/2)

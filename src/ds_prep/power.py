@@ -34,8 +34,6 @@ def sample_size_prop(p1, mde_abs, alpha=0.05, power=0.8, ratio=1.0, pooled=True)
     z_b = NormalDist().inv_cdf(power)
     # Step 2: Conversion rate for treatment group
     p2 = p1 + mde_abs
-    relative_lift = mde_abs/p1
-    print(f"For Control group's conversion rate {100*p1:.2f}% and MDE {100*mde_abs:.2f}%, relative lift is {100*relative_lift:.2f}%")
     # Step 3: Sample size for pooled SE under H0
     if pooled:
         p = (p1 + ratio*p2)/(ratio + 1)
@@ -103,7 +101,7 @@ def mde_prop(p1, n_per_arm, alpha=0.05, power=0.8):
     -----
     ratio is assumed to be one for this function meaning sample size of control group is equal to sample size of treatment group.
     mde is considered small so p2(1-p2) is approximately equal to p1(1-p1)
-    Assuming one pooled SE for both H0 and H1
+    Assuming same pooled SE for both H0 and H1
     """
     # Step 1: z-statistics
     z_a = NormalDist().inv_cdf(1 - alpha/2)
@@ -111,4 +109,4 @@ def mde_prop(p1, n_per_arm, alpha=0.05, power=0.8):
     # Step 2: MDE
     mde = (z_a + z_b)*((2*p1*(1-p1)/n_per_arm)**0.5)
 
-    return round(mde, 4)
+    return mde

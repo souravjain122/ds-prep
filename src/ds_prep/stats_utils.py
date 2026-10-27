@@ -190,3 +190,43 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
         "ci_high": ci_high
     }
     return final_dict
+
+def srm_check(counts, expected_ratios, alpha=0.001):
+    """
+    Performs a chi-square test and returns if mismatch is biased or not
+    
+    Parameters
+    ----------
+    counts : array-like
+        Observed sample size in arms
+    expected_ratios : array-like
+        Expected ratios in which sample size is supposed to be divided
+    alpha : float
+        Significance level, with Confidence Interval covering 1 - alpha
+
+    Returns
+    -------
+    chi2 : float
+        chi-square statistic
+    p_value : float
+        probability of statistic, at least this extreme, if null hypothesis were true
+    srm_detected: boolean
+        True if observed counts are biased else False
+    """
+    # Step 1: Number of arms and Sum of arms
+    number_of_arms = len(counts)
+    if len(expected_ratios) != number_of_arms:
+        raise ValueError("Size of counts and expected ratios are different")
+    total_count = sum(counts)
+    # Step 2: Chi-square statistic
+    chi2_stat = 0
+    for i in range(0, number_of_arms):
+        o = counts[i]
+        e = total_count * expected_ratios[i]
+        chi2_stat += (o-e)**2/e
+    # Step 3: p_value and SRM Detection
+    p_value = stats.chi2.sf(chi2_stat, df=number_of_arms - 1)
+    srm_detected = p_value < alpha
+    # Step 4: Return
+    return {"chi2": chi2_stat, "p_value": p_value, "srm_detected": srm_detected}
+    

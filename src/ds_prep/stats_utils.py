@@ -190,3 +190,52 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
         "ci_high": ci_high
     }
     return final_dict
+
+def srm_check(counts, expected_ratios, alpha=0.001):
+    """
+    Chi-square goodness-of-fit test for sample ratio mismatch
+    
+    Parameters
+    ----------
+    counts : array-like
+        Observed sample size in arms
+    expected_ratios : array-like
+        Expected ratios in which sample size is supposed to be divided
+    alpha : float
+        False-alarm threshold for the SRM check
+
+    Returns
+    -------
+    chi2 : float
+        chi-square statistic
+    p_value : float
+        probability of statistic, at least this extreme, if null hypothesis were true
+    srm_detected: boolean
+        True if the observed split is unlikely under the designed ratios (p < alpha). Indicates broken assignment or logging; does not by itself show the effect estimate is biased.
+    """
+    # Step 1: Number of arms and Sum of arms
+    number_of_arms = len(counts)
+    # Input Validations
+    if len(expected_ratios) != number_of_arms:
+        raise ValueError("Size of counts and expected ratios are different")
+    if not np.isclose(sum(expected_ratios), 1):
+        raise ValueError("Sum of expected ratios is not 1")
+    if min(counts) < 0:
+        raise ValueError("Counts cannot be negative")
+    if min(expected_ratios) <= 0:
+        raise ValueError("Expected ratios cannot be less than or equal to 0")
+
+    # Step 2: Chi-square statistic
+    chi2_stat = 0
+    total_count = sum(counts)
+    for i in range(0, number_of_arms):
+        o = counts[i]
+        e = total_count * expected_ratios[i]
+        chi2_stat += (o-e)**2/e
+    
+    # Step 3: p_value and SRM Detection
+    p_value = stats.chi2.sf(chi2_stat, df=number_of_arms - 1)
+    srm_detected = p_value < alpha
+    # Step 4: Return
+    return {"chi2": chi2_stat, "p_value": p_value, "srm_detected": srm_detected}
+    

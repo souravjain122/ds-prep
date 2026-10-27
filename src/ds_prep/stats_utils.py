@@ -193,7 +193,7 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
 
 def srm_check(counts, expected_ratios, alpha=0.001):
     """
-    srm_detected: True if the observed split is unlikely under the designed ratios (p < alpha). Indicates broken assignment or logging; does not by itself show the effect estimate is biased.
+    Chi-square goodness-of-fit test for sample ratio mismatch
     
     Parameters
     ----------
@@ -202,7 +202,7 @@ def srm_check(counts, expected_ratios, alpha=0.001):
     expected_ratios : array-like
         Expected ratios in which sample size is supposed to be divided
     alpha : float
-        Significance level, with Confidence Interval covering 1 - alpha
+        False-alarm threshold for the SRM check
 
     Returns
     -------
@@ -211,7 +211,7 @@ def srm_check(counts, expected_ratios, alpha=0.001):
     p_value : float
         probability of statistic, at least this extreme, if null hypothesis were true
     srm_detected: boolean
-        True if observed counts are biased else False
+        True if the observed split is unlikely under the designed ratios (p < alpha). Indicates broken assignment or logging; does not by itself show the effect estimate is biased.
     """
     # Step 1: Number of arms and Sum of arms
     number_of_arms = len(counts)
@@ -223,7 +223,7 @@ def srm_check(counts, expected_ratios, alpha=0.001):
     if min(counts) < 0:
         raise ValueError("Counts cannot be negative")
     if min(expected_ratios) <= 0:
-        raise ValueError("Counts cannot be less than or equal to 0")
+        raise ValueError("Expected ratios cannot be less than or equal to 0")
 
     # Step 2: Chi-square statistic
     chi2_stat = 0

@@ -238,4 +238,47 @@ def srm_check(counts, expected_ratios, alpha=0.001):
     srm_detected = p_value < alpha
     # Step 4: Return
     return {"chi2": chi2_stat, "p_value": p_value, "srm_detected": srm_detected}
-    
+
+def ratio_delta(num, den):
+    """
+    Ratio of means and its delta-method standard error.
+
+    Parameters
+    ----------
+    num : array-like
+        Numerators of observed sample
+    den : array-like
+        Denominators of observed sample
+
+    Returns
+    -------
+    r : float
+        Ratio of mean of num to mean of den
+    se : float
+        Standard Error of ratio
+    """
+    # Convert arguments to numpy
+    y = np.asarray(num, dtype = float)
+    x = np.asarray(den, dtype = float)
+    # Input Validations
+    y_shape = y.shape
+    x_shape = x.shape
+    if y_shape != x_shape:
+        raise ValueError(f"Arguments have different sizes: {y_shape} and {x_shape}")
+    # Ratio delta
+    y_bar = y.mean()
+    x_bar = x.mean()
+    ## Input Validations
+    if x_bar == 0:
+        raise ValueError("Mean of denominator is zero; ratio undefined")
+    r = y_bar/x_bar
+    # Ratio Variance
+    n = len(y)
+    y_var = y.var(ddof=1)
+    x_var = x.var(ddof=1)
+    xy_cov = np.cov(x, y, ddof=1)[0, 1]
+    r_var = (y_var - 2*r*xy_cov + (r**2)*x_var)/(n*(x_bar**2))
+    # Standard Error
+    se = r_var**0.5
+    # Return
+    return {"r": r, "se": se}

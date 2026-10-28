@@ -241,7 +241,7 @@ def srm_check(counts, expected_ratios, alpha=0.001):
 
 def ratio_delta(num, den):
     """
-    Ratio Delta
+    Ratio of means and its delta-method standard error.
 
     Parameters
     ----------
@@ -269,8 +269,8 @@ def ratio_delta(num, den):
     y_bar = y.mean()
     x_bar = x.mean()
     ## Input Validations
-    if math.isclose(x_bar, 0, rel_tol=1e-9):
-        raise ValueError(f"Mean of denominator cannot be close to zero")
+    if x_bar == 0:
+        raise ValueError("Mean of denominator is zero; ratio undefined")
     r = y_bar/x_bar
     # Ratio Variance
     n = len(y)

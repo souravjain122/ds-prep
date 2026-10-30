@@ -11,20 +11,20 @@ def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
     Parameters
     ----------
     x1 : int
-        Number of successful events in treatment group
+        Number of converted users in treatment group
     n1 : int
-        Total number of events in treatment group
+        Total number of users in treatment group
     x2 : int
-        Number of successful events in control group
+        Number of converted users in control group
     n2 : int
-        Total number of events in control group
+        Total number of users in control group
     alpha : float
         Significance level, with Confidence Interval covering 1 - alpha
 
     Returns
     -------
     diff : float
-        Change in success rate in treatment group as to the control group
+        p1 - p2 (treatment rate minus control rate). Positive means treatment converts better.
     z : float
         z-statistic
     p_value : float
@@ -34,12 +34,30 @@ def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
     ci_high: float
         highest range of confidence interval
 
+    Raises
+    ------
+    ValueError
+        If n1 or n2 is less than or equal to 0.
+    ValueError
+        If x1 or x2 is negative.
+    ValueError
+        If x1 > n1 or x2 > n2.
+    ValueError
+        If the pooled conversion rate is 0 or 1 (no variation in either
+        group), because the pooled SE is 0 and z is undefined.
+
     Notes
     -----
     During the computation of z-statistic, null hypothesis is assumed to be true so SE is calculated by combining both groups
     For the computation of confidence intervals, we are no longer assuming null hypothesis to be true so SE is calculated unpooled
     """
     # Step 1: diff
+    if n1 <= 0 or n2 <= 0:
+        raise ValueError("Number of users cannot be less than or equal to zero in any group; invalid inputs")
+    if x1 < 0 or x2 < 0:
+        raise ValueError("Number of converted users cannot be less than zero in any group; invalid inputs")
+    if x1 > n1 or x2 > n2:
+        raise ValueError("Converted Users in any group cannot be higher than their respective total users; invalid inputs")
     p1 = x1/n1
     p2 = x2/n2
     diff = p1 - p2
@@ -47,6 +65,8 @@ def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
     p = (x1 + x2)/(n1 + n2)
     se_pooled = (p*(1-p)*((1/n1) + (1/n2)))**0.5
     # Step 3: z-statistic
+    if se_pooled == 0:
+        raise ValueError("pooled rate is 0 or 1; z-test undefined")
     z_obs = diff/se_pooled
     # Step 4: p-value
     p_value = math.erfc(abs(z_obs)/math.sqrt(2))
@@ -85,7 +105,7 @@ def welch_ttest(a, b, alpha=0.05):
     Returns
     -------
     diff : float
-        Difference of mean value from treatment group as to the mean value of control group
+        mean(a) - mean(b) (treatment minus control). Positive means treatment is higher.
     t : float
         t-statistic
     df: float
@@ -96,16 +116,27 @@ def welch_ttest(a, b, alpha=0.05):
         lowest range of confidence interval
     ci_high: float
         highest range of confidence interval
+
+    Raises
+    ------
+    ValueError
+        If size of a or b is less than or equal to 1.
+    ValueError
+        If variance of both a and b is 0.
     """
-    # Step 1: mean, variance and number of events
+    # Step 1: mean, variance and number of users
     a = np.asarray(a)
     b = np.asarray(b)
+    n_a = len(a)
+    n_b = len(b)
+    if n_a <= 1 or n_b <= 1:
+        raise ValueError("Users in any group cannot be less than or equal to 1; invalid inputs")
     x_a = a.mean()
     x_b = b.mean()
     var_a = a.var(ddof = 1)
     var_b = b.var(ddof = 1)
-    n_a = len(a)
-    n_b = len(b)
+    if var_a + var_b == 0:
+        raise ValueError("Variance for both group cannot be zero; t-test undefined")
     # Step 2: Difference of mean
     diff = x_a - x_b
     # Step 3: Standard Error of difference
@@ -157,22 +188,29 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
     Returns
     -------
     diff : float
-        Difference of stat value from treatment group as to the stat value of control group
+        stat(a) - stat(b) (treatment minus control). Positive means treatment is higher.
     ci_low : float
         lowest range of confidence interval
     ci_high: float
         highest range of confidence interval
+    
+    Raises
+    ------
+    ValueError
+        If size of a or b is less than or equal to 1.
     """
     # Step 1: statistic's difference
     a = np.asarray(a)
     b = np.asarray(b)
+    n_a = len(a)
+    n_b = len(b)
+    if n_a <= 1 or n_b <= 1:
+        raise ValueError("Users in any group cannot be less than or equal to 1")
     stat_a = stat(a)
     stat_b = stat(b)
     diff = stat_a - stat_b
     # Step 2: Generate random samples using given samples
     rng = np.random.default_rng(seed)
-    n_a = len(a)
-    n_b = len(b)
     new_a = rng.choice(a, size = (n_boot, n_a), replace = True)
     new_b = rng.choice(b, size = (n_boot, n_b), replace = True)
     # Step 3: Generated Sample's statistics

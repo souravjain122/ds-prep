@@ -105,7 +105,7 @@ def welch_ttest(a, b, alpha=0.05):
     Returns
     -------
     diff : float
-        mean(a) - mean(b) (treatment rate minus control rate). Positive means treatment is higher.
+        mean(a) - mean(b) (treatment minus control). Positive means treatment is higher.
     t : float
         t-statistic
     df: float
@@ -188,7 +188,7 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
     Returns
     -------
     diff : float
-        stat(a) - stat(b) (treatment rate minus control rate). Positive means treatment is higher.
+        stat(a) - stat(b) (treatment minus control). Positive means treatment is higher.
     ci_low : float
         lowest range of confidence interval
     ci_high: float

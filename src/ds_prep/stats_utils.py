@@ -24,8 +24,7 @@ def two_prop_ztest(x1, n1, x2, n2, alpha=0.05):
     Returns
     -------
     diff : float
-        p1 - p2 (treatment rate minus control rate). Positive means
-        treatment converts better.
+        p1 - p2 (treatment rate minus control rate). Positive means treatment converts better.
     z : float
         z-statistic
     p_value : float
@@ -106,8 +105,7 @@ def welch_ttest(a, b, alpha=0.05):
     Returns
     -------
     diff : float
-        p1 - p2 (treatment rate minus control rate). Positive means
-        treatment converts better.
+        mean(a) - mean(b) (treatment rate minus control rate). Positive means treatment is higher.
     t : float
         t-statistic
     df: float
@@ -190,8 +188,7 @@ def bootstrap_ci(a, b, stat=np.mean, n_boot=10_000, alpha=0.05, seed=0):
     Returns
     -------
     diff : float
-        p1 - p2 (treatment rate minus control rate). Positive means
-        treatment converts better.
+        stat(a) - stat(b) (treatment rate minus control rate). Positive means treatment is higher.
     ci_low : float
         lowest range of confidence interval
     ci_high: float

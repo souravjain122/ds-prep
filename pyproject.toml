@@ -1,7 +1,7 @@
 [project]
 name = "ds-prep"
 version = "0.1.0"
-description = "Add your description here"
+description = "Study code for DS/ML interview prep"
 readme = "README.md"
 authors = [
     { name = "Sourav Jain", email = "souravjain122@gmail.com" }

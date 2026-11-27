@@ -45,3 +45,6 @@ strict = true
 warn_unreachable = true
 plugins = ["pydantic.mypy"]
 mypy_path = "src"
+
+[project.scripts]
+ds-prep = "ds_prep.cli:main"

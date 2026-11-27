@@ -1,19 +1,9 @@
 import json
 import logging
-from collections.abc import Iterator
 
 import pytest
 
 from ds_prep.logging_setup import JsonFormatter, configure_logging, run_id_var
-
-
-@pytest.fixture
-def restore_root() -> Iterator[None]:
-    root = logging.getLogger()
-    saved_handlers, saved_level = root.handlers[:], root.level
-    yield
-    root.handlers[:] = saved_handlers
-    root.setLevel(saved_level)
 
 
 def test_json_line_has_run_id_and_extra() -> None:

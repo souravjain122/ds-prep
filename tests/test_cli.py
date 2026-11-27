@@ -7,7 +7,7 @@ from ds_prep.config import get_settings
 
 
 @pytest.fixture(autouse=True)
-def _clear_cache() -> Iterator[None]:
+def _clear_cache(restore_root: None) -> Iterator[None]:
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()

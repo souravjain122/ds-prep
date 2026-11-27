@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="data")
     ap.add_argument("--users", type=int, default=20000)
@@ -65,7 +65,9 @@ def main():
             {
                 "order_id": np.arange(1, m + 1),
                 "user_id": uid,
-                "store_id": [stores[c][k] for c, k in zip(city, rng.integers(0, 8, m))],
+                "store_id": [
+                    stores[c][k] for c, k in zip(city, rng.integers(0, 8, m), strict=True)
+                ],
                 "city": city,
                 "order_ts": ts,
                 "items": items,
@@ -93,9 +95,7 @@ def main():
     exp_users = users.sample(frac=0.6, random_state=a.seed).user_id.values
     k = len(exp_users)
     variant = np.where(rng.random(k) < 0.53, "treatment", "control")
-    exposure = pd.to_datetime("2026-09-01") + pd.to_timedelta(
-        rng.integers(0, 14, k), unit="D"
-    )
+    exposure = pd.to_datetime("2026-09-01") + pd.to_timedelta(rng.integers(0, 14, k), unit="D")
     pre = np.round(rng.lognormal(6.2, 0.9, k) * (rng.random(k) > 0.25), 2)
     base_rate = 0.5 + pre / (pre.mean() * 1.5)
     days_in = (pd.Timestamp("2026-09-14") - exposure).days.values
@@ -117,7 +117,9 @@ def main():
     orders.to_csv(f"{a.out}/orders.csv", index=False)
     experiment.to_csv(f"{a.out}/experiment.csv", index=False)
     print(
-        f"users {len(users):,} | orders {len(orders):,} | experiment {len(experiment):,} -> {a.out}/"
+        f"""users {len(users):,}
+        orders {len(orders):,}
+        experiment {len(experiment):,} -> {a.out}/"""
     )
 
 
